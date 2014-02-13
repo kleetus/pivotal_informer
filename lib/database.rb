@@ -20,7 +20,6 @@ class Database
   end
 
   def post_last_record(record)
-    #record should be:   commit: <number>
     return unless record or not record[:commit] or record[:project_name]
     res = read_last_record(record[:project_name])
     sql = res.nil? ? "insert into commits values ('#{record[:commit]}', '#{record[:project_name]}')" 

@@ -56,7 +56,7 @@ class Informer
     current_sha = parse_out_commit(@commit_msg)
     return unless current_sha
     db = Database.new(@dbdir, @testdb)
-    project_name = File.expand_path('..').split('/').last
+    project_name = File.expand_path('.').split('/').last
     last_read_sha = db.read_last_record(project_name)
     diff_log = compute_diff_log(current_sha, (last_read_sha||current_sha)) 
     db.post_last_record({commit: current_sha, project_name: project_name})
