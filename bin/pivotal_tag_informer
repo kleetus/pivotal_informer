@@ -30,4 +30,4 @@ options = parse_options(ARGV)
 
 informer = Informer.new(options[:config])
 informer.for_realsies = true
-informer.send_tag(options[:commitmsg], options[:tag])
+informer.send_tag(options[:tag])

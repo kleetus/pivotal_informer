@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'pivotal_tag_informer'
-  s.version     = '0.0.2'
-  s.date        = '2014-01-27'
+  s.version     = '0.0.3'
+  s.date        = '2014-02-13'
   s.summary     = 'This gem just updates a pivotal story will a comment.'
   s.description = '' 
   s.authors     = ['Chris Kleeschulte']
@@ -11,4 +11,5 @@ Gem::Specification.new do |s|
   s.homepage    = 'http://kleetus.org'
   s.executables << 'pivotal_tag_informer'
   s.add_dependency('pivotal-tracker', '>= 0.5.12')
+  s.add_dependency('sqlite3')
 end

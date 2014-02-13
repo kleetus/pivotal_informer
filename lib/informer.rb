@@ -1,8 +1,10 @@
 require 'pivotal-tracker'
 require 'yaml'
+require 'sqlite3'
+require_relative './database.rb'
 
 class Informer
-  attr_writer :for_realsies
+  attr_writer :for_realsies, :testdb
 
   include PivotalTracker
  
@@ -20,10 +22,12 @@ class Informer
     end
   end
 
-  def send_tag(commit_msg, tag)
-    story_ids = process_tag(commit_msg)
+  def send_tag(tag)
+    @tag = tag
+    @commit_msg = `git log -n 1` 
+    story_ids = process_tag
     if story_ids.length < 1 
-      puts "I could not pull out the story ids from: #{commit_msg}"
+      puts "I could not pull out the story ids from: #{@commit_msg}"
       exit -1
     end
     stories = []
@@ -31,25 +35,44 @@ class Informer
       stories << @proj.stories.find(story_id)  
     end
     if stories.length < 1 
-      puts "stories could not be found from this commit msg: #{commit_msg}, exiting!"
+      puts "stories could not be found from this commit msg: #{@commit_msg}, exiting!"
       exit -1
     end 
-    stories.each do |story|
+    send_to_pivotal stories
+  end
+
+  def send_to_pivotal(stories)
+    res = stories.map do |story|
       next if story.nil?
-      story.notes.create(:text => tag) if @for_realsies
-      puts "The following note was added to story id: #{story.id}: #{tag}"
+      story.notes.create(:text => @tag) if @for_realsies
+      puts "The following note was added to story id: #{story.id}: #{@tag}"
+      {story.id => @tag}
     end
   end
 
   private
-  def process_tag(tag)
-    res = tag.gsub(/\s+/, '')
+  def process_tag
+    current_sha = parse_out_commit(@commit_msg)
+    return unless current_sha
+    db = Database.new(@testdb)
+    project_name = File.expand_path('..').split('/').last
+    last_read_sha = db.read_last_record(project_name)
+    diff_log = compute_diff_log(current_sha, (last_read_sha||current_sha)) 
+    db.post_last_record({commit: current_sha, project_name: project_name})
+    res = diff_log.gsub(/\s+/, '')
     return res if res.length < 1
-    #check for pivotal ids and possibly multiples separated by '/' all within '[]'
-    #example "[JO][55560306/55560794] Merging over the updates for the Advanced Scr"
-    #example "[CHR] [58243650] Fix floorplans not linking to correct image from det"
     list_of_ids = res.scan(/\[(\d+)|\/*(\d+)\]/)
     list_of_ids.is_a?(Array) ? list_of_ids.flatten.compact : [] 
+  end
+ 
+  def parse_out_commit(msg)
+    res = msg.scan(/commit[\s*]([a-z|0-9]+)[\s*]Author/).first 
+    sha = res.first unless res.nil?
+    sha[0..7] if sha.length>7
+  end
+
+  def compute_diff_log(current, last)
+    current != last ? `git log #{last}..#{current}` : `git log -n 1`
   end
 
 end
