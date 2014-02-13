@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.description = '' 
   s.authors     = ['Chris Kleeschulte']
   s.email       = 'rubygems@kleetus.33mail.com'
-  s.files       = ['lib/informer.rb']
+  s.files       = ['lib/informer.rb', 'lib/database.rb', 'db.sql', 'informer.db']
   s.required_ruby_version = '>= 1.9.3'
   s.homepage    = 'http://kleetus.org'
   s.executables << 'pivotal_tag_informer'
