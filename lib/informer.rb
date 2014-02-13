@@ -4,7 +4,7 @@ require 'sqlite3'
 require_relative './database.rb'
 
 class Informer
-  attr_writer :for_realsies, :testdb
+  attr_writer :for_realsies, :testdb, :dbdir
 
   include PivotalTracker
  
@@ -16,6 +16,7 @@ class Informer
     @config = YAML::load_file(path_to_pivotal_credentials)
     PivotalTracker::Client.token = @config['token'] 
     @proj = PivotalTracker::Project.find(@config['project'])
+    @dbdir = @config['dbdir']
     unless @proj
       puts "Could not find a pivotal project with the token and project provided, exiting!"
       exit -1
@@ -54,7 +55,7 @@ class Informer
   def process_tag
     current_sha = parse_out_commit(@commit_msg)
     return unless current_sha
-    db = Database.new(@testdb)
+    db = Database.new(@dbdir, @testdb)
     project_name = File.expand_path('..').split('/').last
     last_read_sha = db.read_last_record(project_name)
     diff_log = compute_diff_log(current_sha, (last_read_sha||current_sha)) 
@@ -62,7 +63,7 @@ class Informer
     res = diff_log.gsub(/\s+/, '')
     return res if res.length < 1
     list_of_ids = res.scan(/\[(\d+)|\/*(\d+)\]/)
-    list_of_ids.is_a?(Array) ? list_of_ids.flatten.compact : [] 
+    list_of_ids.is_a?(Array) ? list_of_ids.flatten.compact.uniq : [] 
   end
  
   def parse_out_commit(msg)

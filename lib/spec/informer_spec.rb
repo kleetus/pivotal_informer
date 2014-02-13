@@ -2,11 +2,12 @@ require_relative './spec_helper.rb'
 
 
 describe Informer do
-  before :all do
+  before :each do
     create_test_repo
     @informer = Informer.new('/Users/kleetus/pivotal.yml')
     @informer.testdb = 'test.db'
-    @database = Database.new('test.db')
+    @informer.dbdir = '/tmp'
+    @database = Database.new('/tmp', 'test.db')
   end
 
   it "should deal with no previous record in db" do
@@ -21,8 +22,8 @@ describe Informer do
   end
 
 
-  after :all do
-    `rm -fr test.d*`
+  after :each do
+    `rm -fr /tmp/test.d*`
     `rm -fr .git test.txt`  
   end
  

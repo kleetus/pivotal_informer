@@ -3,25 +3,20 @@ require 'sqlite3'
 
 class Database
 
-  def initialize(dbname=nil)
+  def initialize(dbdir, dbname=nil)
+    @dbdir = dbdir
     @db_name = dbname.nil? ? "informer.db" : dbname 
-    create_database unless File.exists? @db_name 
+    create_database unless File.exists? "#{@dbdir}/#{@db_name}" 
   end
 
   def db
-    @db ||= SQLite3::Database.new @db_name 
+    @db ||= SQLite3::Database.new "#{@dbdir}/#{@db_name}" 
   end
 
   def create_database
-    drop_database
     sql_file_name = "#{File.dirname(__FILE__)}/db.sql"
     db_file = File.read sql_file_name
     db.execute db_file
-  end
-
-  def drop_database
-    system "touch #{@db_name}"
-    system "mv #{@db_name} #{@db_name}.#{Time.now.to_i}" 
   end
 
   def post_last_record(record)

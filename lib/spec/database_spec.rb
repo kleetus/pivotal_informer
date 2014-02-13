@@ -1,8 +1,8 @@
 require_relative './spec_helper.rb'
 
 describe Database do
-  before :all do
-    @database = Database.new('test.db')
+  before :each do
+    @database = Database.new('/tmp', 'test.db')
   end
 
   it "should insert a record into the table and read it back" do
@@ -16,7 +16,7 @@ describe Database do
     @database.read_last_record('test project').should == 'hgfedcba' 
   end 
 
-  after :all do
-    system "rm -fr test.d*"
+  after :each do
+    system "rm -fr /tmp/test.d*"
   end
 end
