@@ -13,10 +13,6 @@ def parse_options(args)
       options[:config] = c
     end
 
-    opts.on("-m", "--commitmsg [COMMITMSG]", "the full commit message") do |m|
-      options[:commitmsg] = m
-    end
-
     opts.on("-t", "--tag [TAG]", "the note that needs to get sent in for the stories found in the commit message") do |t|
       options[:tag] = t
     end
