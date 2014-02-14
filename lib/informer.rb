@@ -53,7 +53,7 @@ class Informer
 
   private
   def process_tag
-    current_sha = parse_out_commit(@commit_msg)
+    current_sha = parse_out_commit
     return unless current_sha
     db = Database.new(@dbdir, @testdb)
     project_name = File.expand_path('.').split('/').last
@@ -66,8 +66,8 @@ class Informer
     list_of_ids.is_a?(Array) ? list_of_ids.flatten.compact.uniq : [] 
   end
  
-  def parse_out_commit(msg)
-    res = msg.scan(/commit[\s*]([a-z|0-9]+)[\s*]Author/).first 
+  def parse_out_commit
+    res = @commit_msg.scan(/commit[\s*]([a-z|0-9]+)$/).first 
     sha = res.first unless res.nil?
     sha[0..7] if sha.length>7
   end
