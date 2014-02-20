@@ -28,7 +28,7 @@ class Informer
     @commit_msg = `git log -n 1` 
     story_ids = process_tag
     if story_ids.length < 1 
-      puts "I could not pull out the story ids from: #{@commit_msg}"
+      puts "I could not pull out the story ids from: #{@commit_msg}\n\n-OR- we have already sent this tag to Pivotal"
       exit -1
     end
     stories = []
@@ -57,8 +57,9 @@ class Informer
     return unless current_sha
     db = Database.new(@dbdir, @testdb)
     last_read_sha = db.read_last_record(project_name)
-    diff_log = compute_diff_log(current_sha, (last_read_sha||current_sha)) 
     db.post_last_record({commit: current_sha, project_name: project_name})
+    diff_log = compute_diff_log(current_sha, last_read_sha) 
+    return [] unless diff_log
     res = diff_log.gsub(/\s+/, '')
     return res if res.length < 1
     list_of_ids = res.scan(/\[(\d+)|\/*(\d+)\]/)
@@ -76,7 +77,8 @@ class Informer
   end
 
   def compute_diff_log(current, last)
-    current != last ? `git log #{last}..#{current}` : `git log -n 1`
+    return `git log -n 1` unless last 
+    return `git log #{last}..#{current}` if current != last 
   end
 
 end
