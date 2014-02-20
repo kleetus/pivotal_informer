@@ -56,7 +56,6 @@ class Informer
     current_sha = parse_out_commit
     return unless current_sha
     db = Database.new(@dbdir, @testdb)
-    project_name = File.expand_path('.').split('/').last
     last_read_sha = db.read_last_record(project_name)
     diff_log = compute_diff_log(current_sha, (last_read_sha||current_sha)) 
     db.post_last_record({commit: current_sha, project_name: project_name})
@@ -66,6 +65,10 @@ class Informer
     list_of_ids.is_a?(Array) ? list_of_ids.flatten.compact.uniq : [] 
   end
  
+  def project_name
+    @project_name ||= File.expand_path('.').split('/').send("[]",  (File.directory?('.git') ? -1 : -2))
+  end
+
   def parse_out_commit
     res = @commit_msg.scan(/commit[\s*]([a-z|0-9]+)$/).first 
     sha = res.first unless res.nil?
