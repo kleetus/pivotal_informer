@@ -35,8 +35,9 @@ class Informer
     story_ids.each do |story_id|
       stories << @proj.stories.find(story_id)  
     end
+    stories = check_stories_for_tag_type(stories)
     if stories.length < 1 
-      puts "stories could not be found from this commit msg: #{@commit_msg}, exiting!"
+      puts "stories could not be found from this commit msg: #{@commit_msg} \nexiting!"
       exit -1
     end 
     send_to_pivotal stories
@@ -81,4 +82,16 @@ class Informer
     return `git log #{last}..#{current}` if current != last 
   end
 
+  def check_stories_for_tag_type(stories)
+    ret = []
+	
+    stories.each do |story|
+      labels = story.labels.scan(/(ag)|(rent)/).flatten.compact!
+      labels << "apartmentguide" if labels.member? 'ag'
+      labels.each do |label|
+        ret << story if project_name =~ /#{label}/
+      end
+    end 
+    ret
+  end
 end
