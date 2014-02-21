@@ -11,7 +11,7 @@ class Informer
   def initialize(path_to_pivotal_credentials)
     unless File.exists?(path_to_pivotal_credentials)
       puts "#{path_to_pivotal_credentials} does not exist, exiting!}"
-      exit -1
+      return
     end
     @config = YAML::load_file(path_to_pivotal_credentials)
     PivotalTracker::Client.token = @config['token'] 
@@ -19,7 +19,7 @@ class Informer
     @dbdir = @config['dbdir']
     unless @proj
       puts "Could not find a pivotal project with the token and project provided, exiting!"
-      exit -1
+      return
     end
   end
 
@@ -29,7 +29,7 @@ class Informer
     story_ids = process_tag
     if story_ids.length < 1 
       puts "I could not pull out the story ids from: #{@commit_msg}\n\n-OR- we have already sent this tag to Pivotal"
-      exit -1
+      return
     end
     stories = []
     story_ids.each do |story_id|
@@ -38,7 +38,7 @@ class Informer
     stories = check_stories_for_tag_type(stories)
     if stories.length < 1 
       puts "stories could not be found from this commit msg: #{@commit_msg} \nexiting!"
-      exit -1
+      return
     end 
     send_to_pivotal stories
   end
