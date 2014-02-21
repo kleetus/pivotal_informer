@@ -40,7 +40,7 @@ class Informer
       puts "stories could not be found from this commit msg: #{@commit_msg} \nexiting!"
       return
     end 
-    send_to_pivotal stories
+    send_to_pivotal stories.uniq!
   end
 
   def send_to_pivotal(stories)
