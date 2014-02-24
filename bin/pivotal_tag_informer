@@ -7,7 +7,7 @@ require 'optparse'
 def parse_options(args)
   options = {}
   OptionParser.new do |opts|
-    opts.banner = "Usage: mobile_deployment --config <config> --commitmsg <msg> --tag <note>"
+    opts.banner = "Usage: pivotal_tag_informer --config <config> --commitmsg <msg> --tag <note>"
 
     opts.on("-c", "--config [CONFIG]", "Config file to use in yaml format, e.g. /tmp/config.yml") do |c|
       options[:config] = c

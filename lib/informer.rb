@@ -44,6 +44,7 @@ class Informer
   end
 
   def send_to_pivotal(stories)
+    return unless stories
     res = stories.map do |story|
       next if story.nil?
       story.notes.create(:text => @tag) if @for_realsies
