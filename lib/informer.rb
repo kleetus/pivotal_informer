@@ -35,7 +35,7 @@ class Informer
     story_ids.each do |story_id|
       stories << @proj.stories.find(story_id)  
     end
-    stories = check_stories_for_tag_type(stories)
+    stories = check_stories_for_tag_type(stories) if stories.length > 0
     if stories.length < 1 
       puts "stories could not be found from this commit msg: #{@commit_msg} \nexiting!"
       return
