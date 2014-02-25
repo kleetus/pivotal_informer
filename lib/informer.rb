@@ -40,7 +40,7 @@ class Informer
       puts "stories could not be found from this commit msg: #{@commit_msg} \nexiting!"
       return
     end 
-    send_to_pivotal stories.uniq!
+    send_to_pivotal stories.uniq
   end
 
   def send_to_pivotal(stories)
@@ -85,10 +85,11 @@ class Informer
 
   def check_stories_for_tag_type(stories)
     ret = []
-	
+    
     stories.each do |story|
       labels = story.labels.scan(/(ag)|(rent)/).flatten.compact!
       labels << "apartmentguide" if labels.member? 'ag'
+      labels.uniq!
       labels.each do |label|
         ret << story if project_name =~ /#{label}/
       end
