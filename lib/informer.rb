@@ -1,4 +1,4 @@
-require 'pivotal-tracker'
+require 'pivotal-tracker-api'
 require 'yaml'
 require 'sqlite3'
 require_relative './database.rb'
@@ -6,21 +6,15 @@ require_relative './database.rb'
 class Informer
   attr_writer :for_realsies, :testdb, :dbdir
 
-  include PivotalTracker
- 
   def initialize(path_to_pivotal_credentials)
     unless File.exists?(path_to_pivotal_credentials)
       puts "#{path_to_pivotal_credentials} does not exist, exiting!}"
       return
     end
     @config = YAML::load_file(path_to_pivotal_credentials)
-    PivotalTracker::Client.token = @config['token'] 
-    @proj = PivotalTracker::Project.find(@config['project'])
+    PivotalService.set_token(@config['token'])
+
     @dbdir = @config['dbdir']
-    unless @proj
-      puts "Could not find a pivotal project with the token and project provided, exiting!"
-      return
-    end
   end
 
   def send_tag(tag)
@@ -33,7 +27,7 @@ class Informer
     end
     stories = []
     story_ids.each do |story_id|
-      stories << @proj.stories.find(story_id)  
+      stories << PivotalService.find_story(@config['project'], story_id)  
     end
     stories = check_stories_for_tag_type(stories) if stories.length > 0
     if stories.length < 1 
@@ -47,7 +41,7 @@ class Informer
     return unless stories
     res = stories.map do |story|
       next if story.nil?
-      story.notes.create(:text => @tag) if @for_realsies
+      PivotalService.post_comments(@config['project'], story.id, @tag) if @for_realsies
       puts "The following note was added to story id: #{story.id}: #{@tag}"
       {story.id => @tag}
     end
@@ -87,7 +81,12 @@ class Informer
     ret = []
     
     stories.each do |story|
-      labels = story.labels.scan(/(ag)|(rent)/).flatten.compact!
+      labels = story.labels.map {|m| m[:name] }
+      unless labels
+        puts "Story: #{story.id} does not have any labels, therefore cannot post back to pivotal."
+        next
+      end
+      labels = story.labels.join(',').scan(/(ag)|(rent)/).flatten.compact!
       labels << "apartmentguide" if labels.member? 'ag'
       labels.uniq!
       labels.each do |label|
