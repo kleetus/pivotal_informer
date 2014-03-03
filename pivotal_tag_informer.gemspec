@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'pivotal_tag_informer'
-  s.version     = '0.0.17'
+  s.version     = '0.0.18'
   s.date        = '2014-03-03'
   s.summary     = 'This gem just updates a pivotal story with a comment.'
   s.description = '' 
@@ -10,6 +10,6 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 1.9.3'
   s.homepage    = 'http://kleetus.org'
   s.executables << 'pivotal_tag_informer'
-  s.add_dependency('pivotal-tracker', '>= 0.5.12')
+  s.add_dependency('pivotal-tracker-api', '= 0.1.6')
   s.add_dependency('sqlite3')
 end
