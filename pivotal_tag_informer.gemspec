@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'pivotal_tag_informer'
-  s.version     = '0.0.16'
-  s.date        = '2014-02-25'
+  s.version     = '0.0.17'
+  s.date        = '2014-03-03'
   s.summary     = 'This gem just updates a pivotal story with a comment.'
   s.description = '' 
   s.authors     = ['Chris Kleeschulte']
