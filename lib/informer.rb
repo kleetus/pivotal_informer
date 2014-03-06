@@ -87,6 +87,7 @@ class Informer
         next
       end
       labels = story.labels.join(',').scan(/(ag)|(rent)/).flatten.compact!
+      return [] unless labels
       labels << "apartmentguide" if labels.member? 'ag'
       labels.uniq!
       labels.each do |label|
